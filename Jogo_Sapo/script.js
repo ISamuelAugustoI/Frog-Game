@@ -9,6 +9,8 @@ var frog_is_move = false;
 var cars = [];
 var logs = [];
 var frog_on_log = false;
+var flag = 0;
+is_game_start = false;
 // Criando os sprites \\
 const frog_sprites = {
     up: ["./Imagens/sapo-up1.png", "./Imagens/sapo-up2.png"],
@@ -27,11 +29,13 @@ const logs_sprites = {
 // Iniciando o jogo \\
 document.getElementById("start").addEventListener("click", start_game);
 function start_game(){
+    if(is_game_start) return;
     game_board.innerHTML = "";
+    flag = 0;
     create_grid();
     create_frog();
     start_car_generation();
-    start_log_generation();
+    is_game_start = true;
 }
 // Criando a grid do jogo
 function create_grid() {
@@ -56,6 +60,9 @@ function create_frog(){
 function update_frog_position() {
     frog.style.gridColumn = frog_pos_x+1;
     frog.style.gridRow = frog_pos_y+1;
+    if(frog.style.gridRow==1){
+        create_text("VICTORY!!!");
+    }
     check_collision();
 }
 // Muda a posição do sapo \\
@@ -144,15 +151,26 @@ function start_car_generation() {
         if(Math.random()<1){
             create_car();
         }
-    }, Math.random()*(1500-500)+500);
+    }, Math.random()*400);
     setInterval(move_cars,300);
 }
 // *** Checagem de colisão ***
+flag = 0;
 function check_collision() {
+    if (flag) return;
     cars.forEach((car) => {
-        if (car.x === frog_pos_x && car.y === frog_pos_y) {
-            alert("💀 GAME OVER! O sapo foi atropelado!");
-            location.reload();
+        if (car.x === frog_pos_x && car.y === frog_pos_y){
+            flag = 1;
+            create_text("GAME OVER!!!")
         }
     });
+}
+// *** Criando a tela de game over e vitoria *** \\
+function create_text(txt){
+    var text = document.getElementById("text").innerHTML = txt;
+    document.getElementById("text").style.display = "block";
+    setTimeout(finish_game,500)
+}
+function finish_game(){
+    location.reload()
 }
